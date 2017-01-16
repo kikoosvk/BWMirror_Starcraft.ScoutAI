@@ -3,6 +3,8 @@ package MapManager;
 import bwapi.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.awt.*;
+import bwapi.Color;
 import java.util.List;
 
 /**
@@ -11,6 +13,7 @@ import java.util.List;
 public class PotentialField {
 
     private int id;
+    private Unit unit;
 
     private UnitType unitType;
 
@@ -80,6 +83,7 @@ public class PotentialField {
         this.radius=pUnit.getType().sightRange();
         this.heat=0;
         this.id=pUnit.getID();
+        this.unit = pUnit;
         this.unitType=pUnit.getType();
         this.row=-1;
         this.column=-1;
@@ -155,7 +159,12 @@ public class PotentialField {
      * @return
      */
     public boolean isVisible(List<Unit> units) {
-        throw new NotImplementedException();
+
+        for (Unit unit :
+                units) {
+            if(unit.isVisible()) return true;
+        }
+        return false;
     }
 
     public boolean isVisible(Unit unit) {
@@ -202,6 +211,15 @@ public class PotentialField {
 
     public Position getPosition() {
         return new Position(X,Y);
+    }
+    public boolean isVisible(Game game){
+        TilePosition upLeft = new TilePosition((int)(row*4),(int)(column*4));
+        TilePosition upRight = new TilePosition((int)(row*4),(int)(column*4)+3);
+        TilePosition downLeft = new TilePosition((int)(row*4)+3,(int)(column*4));
+        TilePosition downRight = new TilePosition((int)(row*4)+3,(int)(column*4)+3);
+
+        return game.isVisible(upLeft) || game.isVisible(upRight) || game.isVisible(downLeft) || game.isVisible(downRight);
+
     }
 
     public int getRow() {
@@ -274,5 +292,24 @@ public class PotentialField {
 
     public void setRadius(int radius) {
         this.radius = radius;
+    }
+
+    public void showGraphicsRectangular(Game pGame, Color color) {
+        pGame.drawBoxMap((int) (X - (radius )),
+                (int) (Y - (radius)),
+                (int) (X + (radius )),
+                (int) (Y + (radius )), color);
+    }
+
+    public void showGraphicsCircular(Game pGame, Color orange) {
+        pGame.drawCircleMap(X,Y,(int)radius,orange);
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public String getXANDY(){
+        return "{"+X+','+Y+"}";
     }
 }
