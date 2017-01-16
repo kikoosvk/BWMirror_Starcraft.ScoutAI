@@ -1,5 +1,6 @@
 package MapManager;
 
+import bwapi.Color;
 import bwapi.Game;
 
 import java.util.ArrayList;
@@ -83,6 +84,19 @@ public class ScoutingArea {
         return null;
     }
 
+
+
+    /* ------------------- Drawing methods ------------------- */
+
+    public void drawScoutingArea(Game game) {
+        for(PotentialField pf:fieldArray) {
+            Vector2D v1 = pf.getLeftUpperCornerBoxVector().add(new Vector2D(10,10));
+            Vector2D v2 = pf.getRightLowerCornerBoxVector().sub(new Vector2D(10, 10));
+
+            game.drawBoxMap((int)v1.getX(),(int)v1.getY(),(int)v2.getX(),(int)v2.getY(), Color.Orange);
+
+        }
+    }
 
 
     /* ------------------- Getters and setters ------------------- */

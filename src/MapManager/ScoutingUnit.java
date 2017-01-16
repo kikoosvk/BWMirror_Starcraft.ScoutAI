@@ -5,6 +5,7 @@ import MODaStar.Block;
 import bwapi.Color;
 import bwapi.Game;
 import bwapi.Unit;
+import bwta.BWTA;
 
 import java.util.ArrayList;
 
@@ -47,6 +48,7 @@ public class ScoutingUnit {
         hasOrder=false;
         finishedOrder=true;
         hasTask=false;
+
     }
 
 
