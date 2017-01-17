@@ -1,12 +1,16 @@
 package MapManager;
 
-import bwapi.*;
-
+import bwapi.Game;
+import bwapi.Position;
 
 /**
  * Created by Chudjak Kristián on 05.01.2017.
  */
 public class HeatMap {
+    private int SIZE = TilePosition.SIZE_IN_PIXELS*GRIDTILESIZE;
+
+    public static final int GRIDTILESIZE = 8;
+
     public static boolean DEBUG=false;
 
     /**
@@ -18,7 +22,6 @@ public class HeatMap {
 
     private int columns;
 
-    private int SIZE = TilePosition.SIZE_IN_PIXELS*4;
 
     /* ------------------- Constructors ------------------- */
 
@@ -35,12 +38,12 @@ public class HeatMap {
     /* ------------------- Initialization methods ------------------- */
 
     public void initializeHeatMap(int pRectangleSidePX, Game pGame) {
-        int mapheight = pGame.mapHeight();
-        //rows=pGame.mapHeight()/pRectangleSidePX;
-        //columns=pGame.mapWidth()/pRectangleSidePX;
-        rows = pGame.mapHeight()/4;
-        columns = pGame.mapWidth()/4;
+        /*rows=pGame.mapHeight()/pRectangleSidePX;
 
+        columns=pGame.mapWidth()/pRectangleSidePX;*/
+
+        rows = pGame.mapWidth()/GRIDTILESIZE;
+        columns = pGame.mapHeight()/GRIDTILESIZE;
 
         fieldMap=new PotentialField[rows][columns];
 
@@ -57,11 +60,8 @@ public class HeatMap {
 
                 fieldMap[i][j]=new PotentialField(pGame,new Position(i*SIZE,
                         j*SIZE),SIZE,SIZE,i,j);
-                System.out.println(i+","+j+" pos: "+i*SIZE+","+j*SIZE);
             }
         }
-
-
 //
 //        if(GridMap.DEBUG) {
 //            System.out.println("BlockMap size = "+getBlockMapSize());
@@ -115,7 +115,8 @@ public class HeatMap {
     public void heatManagement(Game pGame) {
         for(int i=0;i<rows;i++) {
             for(int j=0;j<columns;j++) {
-                if(fieldMap[i][j].isVisible(pGame)) {
+                if(pGame.isVisible(fieldMap[i][j].getPosition().getX(),fieldMap[i][j].getPosition().getY())) {
+
                     fieldMap[i][j].setHeat(0);
                 } else {
                     fieldMap[i][j].increaseHeat();
@@ -123,7 +124,6 @@ public class HeatMap {
             }
         }
     }
-
 
 
     public void drawHeatMap(Game pGame) {
@@ -140,6 +140,7 @@ public class HeatMap {
             }
         }
     }
+
 
 
     /* ------------------- Getters and setters ------------------- */

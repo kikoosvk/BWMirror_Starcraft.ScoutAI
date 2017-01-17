@@ -1,19 +1,17 @@
 package MapManager;
 
 import bwapi.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.awt.*;
-import bwapi.Color;
 import java.util.List;
 
+import static MapManager.HeatMap.GRIDTILESIZE;
+
 /**
- * Created by Chudjak Kristián on 05.01.2017.
+ * Represents certain area on the map and provides information about this area
  */
 public class PotentialField {
 
     private int id;
-    private Unit unit;
 
     private UnitType unitType;
 
@@ -42,6 +40,7 @@ public class PotentialField {
      */
     private double heat;
 
+    private Game game;
 
 
     /* ------------------- Constructors ------------------- */
@@ -49,12 +48,12 @@ public class PotentialField {
     /**
      * Initialization of PF with given game instance, graphics instance, center X and Y coordiantes and given radius
      *
-     * @param game
+     * @param pGame
      * @param X
      * @param Y
      * @param radius
      */
-    public PotentialField(Game game, int X, int Y, int radius) {
+    public PotentialField(Game pGame, int X, int Y, int radius) {
         this.priority=0;
         this.X=X;
         this.Y=Y;
@@ -63,9 +62,10 @@ public class PotentialField {
         this.id=-1;
         this.row=-1;
         this.column=-1;
+        game=pGame;
     }
 
-    public PotentialField(Game game, Position position, int radius) {
+    public PotentialField(Game pGame, Position position, int radius) {
         this.priority=0;
         this.X=position.getX();
         this.Y=position.getY();
@@ -74,6 +74,7 @@ public class PotentialField {
         this.id=-1;
         this.row=-1;
         this.column=-1;
+        this.game=pGame;
     }
 
     public PotentialField(Game pGame, Unit pUnit) {
@@ -83,14 +84,13 @@ public class PotentialField {
         this.radius=pUnit.getType().sightRange();
         this.heat=0;
         this.id=pUnit.getID();
-        this.unit = pUnit;
         this.unitType=pUnit.getType();
         this.row=-1;
         this.column=-1;
-        //System.out.println("PF radius = "+radius);
+        game=pGame;
     }
 
-    public PotentialField(Game game, int X, int Y, int radius, double priority) {
+    public PotentialField(Game pGame, int X, int Y, int radius, double priority) {
         this.priority=priority;
         this.X=X;
         this.Y=Y;
@@ -99,9 +99,10 @@ public class PotentialField {
         this.id=-1;
         this.row=-1;
         this.column=-1;
+        game=pGame;
     }
 
-    public PotentialField(Game game,Position position,int radius, int priority) {
+    public PotentialField(Game pGame,Position position,int radius, int priority) {
         this.priority=priority;
         this.X=position.getX();
         this.Y=position.getY();
@@ -110,9 +111,10 @@ public class PotentialField {
         this.id=-1;
         this.row=-1;
         this.column=-1;
+        game=pGame;
     }
 
-    public PotentialField(Game game,Position position,int radius, int priority, int pRow, int pColumn) {
+    public PotentialField(Game pGame,Position position,int radius, int priority, int pRow, int pColumn) {
         this.priority=priority;
         this.X=position.getX();
         this.Y=position.getY();
@@ -121,6 +123,7 @@ public class PotentialField {
         this.id=-1;
         this.row=pRow;
         this.column=pColumn;
+        game=pGame;
     }
 
 
@@ -159,21 +162,36 @@ public class PotentialField {
      * @return
      */
     public boolean isVisible(List<Unit> units) {
-
-        for (Unit unit :
-                units) {
-            if(unit.isVisible()) return true;
-        }
-        return false;
+        return game.isVisible(this.getPosition().toTilePosition());
     }
 
     public boolean isVisible(Unit unit) {
-        if(unit.isVisible()) {
-            return true;
-        }
-        return false;
+        return game.isVisible(this.getPosition().toTilePosition());
     }
 
+    /**
+     * checks if this potential field is visible
+     * @param game game objects
+     * @return true if atleast one of its corner is visible
+     */
+    public boolean isVisible(Game game){
+        /*TilePosition upLeft = new TilePosition((int)(row*GRIDTILESIZE),(int)(column*GRIDTILESIZE));
+        TilePosition upRight = new TilePosition((int)(row*GRIDTILESIZE),
+                (int)(column*GRIDTILESIZE)+GRIDTILESIZE-1);
+        TilePosition downLeft = new TilePosition((int)(row*GRIDTILESIZE)+GRIDTILESIZE-1,
+                (int)(column*GRIDTILESIZE));
+        TilePosition downRight = new TilePosition((int)(row*GRIDTILESIZE)+GRIDTILESIZE-1,
+                (int)(column*GRIDTILESIZE)+GRIDTILESIZE-1);*/
+
+        TilePosition middle = new TilePosition((int)(row*GRIDTILESIZE)+GRIDTILESIZE/2,
+                (int)(column*GRIDTILESIZE)+GRIDTILESIZE/2);
+
+        return game.isVisible(middle); // checks tile in the middle, the other ones ale more precise
+
+        /*return game.isVisible(upLeft) || game.isVisible(upRight) ||
+                game.isVisible(downLeft) || game.isVisible(downRight) || game.isVisible(middle);*/
+
+    }
     public boolean isUnitInRange(Unit pUnit) {
         Position pos=new Position(X,Y);
         if(pos.getDistance(pUnit.getPosition())<=radius&&pUnit.getID()==id) {
@@ -207,19 +225,37 @@ public class PotentialField {
     }
 
 
+    /* ------------------- Drawing functions ------------------- */
+
+    /**
+     * Visually draws circular field on screen
+     */
+    public void showGraphicsCircular(Color pColor) {
+        game.drawDotMap(this.getPosition(),pColor);
+        game.drawCircleMap(this.getPosition(),(int)radius,pColor);
+        game.drawTextMap(X-10,Y-20,String.format("%.3g%n", heat));
+        game.drawTextMap(X-10,Y-40,Boolean.toString(isVisible(game.getAllUnits())));
+    }
+
+    /**
+     * Visually draws rectangular potential field on screen
+     */
+//    public void showGraphicsRectangular(Game game,Color color) {
+//        graphics.setColor(color);
+//        graphics.drawDotALTERNATIVE(new Vector2D(X,Y));
+//        graphics.drawBoxALTERNATIVE(new Vector2D((float) (X - (radius / 2)), (float) (Y - (radius / 2))), new Vector2D((float) (X + (radius / 2)), (float) (Y + (radius / 2))));
+//        graphics.drawTextALTERNATIVE(new Vector2D(X - 10, Y - 20), String.format("%.3g%n", heat));
+//        graphics.drawTextALTERNATIVE(new Vector2D(X - 10, Y - 40), isVisible(game.getMyUnits()));
+//
+//        /*TESTING ADDED INFO
+//        graphics.drawTextALTERNATIVE(new Vector2D(X - 10, Y - 40), new Vector2D(X,Y).toPosition().getPX()+";"+new Vector2D(X,Y).toPosition().getPY());
+//        /*END TESTING*/
+//    }
+
     /* ------------------- Getters and Setters ------------------- */
 
     public Position getPosition() {
         return new Position(X,Y);
-    }
-    public boolean isVisible(Game game){
-        TilePosition upLeft = new TilePosition((int)(row*4),(int)(column*4));
-        TilePosition upRight = new TilePosition((int)(row*4),(int)(column*4)+3);
-        TilePosition downLeft = new TilePosition((int)(row*4)+3,(int)(column*4));
-        TilePosition downRight = new TilePosition((int)(row*4)+3,(int)(column*4)+3);
-
-        return game.isVisible(upLeft) || game.isVisible(upRight) || game.isVisible(downLeft) || game.isVisible(downRight);
-
     }
 
     public int getRow() {
@@ -295,21 +331,11 @@ public class PotentialField {
     }
 
     public void showGraphicsRectangular(Game pGame, Color color) {
-        pGame.drawBoxMap((int) (X - (radius )),
-                (int) (Y - (radius)),
-                (int) (X + (radius )),
-                (int) (Y + (radius )), color);
+        pGame.drawBoxMap((int) (X+2),
+                (int) (Y + 2),
+                (int) (X -2 + (radius )),
+                (int) (Y-2 + (radius )), color);
     }
 
-    public void showGraphicsCircular(Game pGame, Color orange) {
-        pGame.drawCircleMap(X,Y,(int)radius,orange);
-    }
 
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public String getXANDY(){
-        return "{"+X+','+Y+"}";
-    }
 }

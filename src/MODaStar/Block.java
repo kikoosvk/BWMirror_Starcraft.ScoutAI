@@ -1,10 +1,6 @@
 package MODaStar;
 
-
-import bwapi.Color;
-import bwapi.Game;
-import bwapi.Position;
-import bwapi.WalkPosition;
+import bwapi.*;
 
 /**
  * Class Block represents each block in grid map. Blocks are also used in Tree data structure
@@ -73,7 +69,6 @@ public class Block {
         row=pRow;
         column=pColumn;
         accessibleByAir=true;
-        accessibleByGround=isAccessibleByGround(game);
         startingBlock=false;
         damage=0;
         airDamage=false;
@@ -128,10 +123,12 @@ public class Block {
     /* -------------------Other methods ------------------- */
 
     public boolean isAccessibleByGround(Game game) {
-        if(game!=null) {
-            return game.isWalkable(new WalkPosition(position.getX(),position.getY()));
-        }
-        else return true;
+//        ToDo: nefunguje!!
+//        if(game!=null) {
+//            return game.isWalkable(position.getX(),position.getY());
+//        }
+//        else return true;
+        return true;
     }
 
     public boolean isAccessibleByAir() {
@@ -224,6 +221,33 @@ public class Block {
         } else {
             rightChild=null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" +
+                "color=" + color +
+                ", inPotentialField=" + inPotentialField +
+                ", startingBlock=" + startingBlock +
+                ", accessibleByAir=" + accessibleByAir +
+                ", accessibleByGround=" + accessibleByGround +
+                ", row=" + row +
+                ", column=" + column +
+                ", position=" + position +
+                ", radius=" + radius +
+                ", showInGame=" + showInGame +
+                ", distance_value=" + distance_value +
+                ", destination_distance=" + destination_distance +
+                ", f_value=" + f_value +
+                ", parent=" + parent +
+                ", damage=" + damage +
+                ", health=" + health +
+                ", airDamage=" + airDamage +
+                ", groundDamage=" + groundDamage +
+                ", leftChild=" + leftChild +
+                ", rightChild=" + rightChild +
+                ", sibiling=" + sibiling +
+                '}';
     }
 
     public boolean isShowInGame() {
