@@ -34,11 +34,12 @@ public class Bot extends DefaultBWListener {
         game = mirror.getGame();
         player = game.self();
 
-        System.out.println("Analyzing map...");
-        BWTA.readMap();
-        BWTA.analyze();
-        System.out.println("BWTA scan complete !");
-
+        /* BWTA zatial nie je potrebne, zbytocne spomaluje hru
+            System.out.println("Analyzing map...");
+            BWTA.readMap();
+            BWTA.analyze();
+            System.out.println("BWTA scan complete !");
+        */
         scout=new Scout_module(game);
         scout.onStart();
         consoleHandler=new ConsoleHandler(scout);

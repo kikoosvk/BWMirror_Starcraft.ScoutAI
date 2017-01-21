@@ -58,6 +58,7 @@ public class AStarPathCalculator implements Runnable {
      * Starts pathfinding with modified A* algorithm
      */
     public void run() {
+
         if(AStarPathCalculator.DEBUG) {
             System.out.println("--:: Beginning pathfinding method ::--");
         }
@@ -82,11 +83,20 @@ public class AStarPathCalculator implements Runnable {
         switch (levelOfSafety) {
             case 0: constant_K=0;
                 break;
-            case 1: constant_K=5;
+            case 1: constant_K=5; //5
                 break;
-            case 2: constant_K=10;
+            case 2: constant_K=10; //10
                 break;
-            case 3: constant_K=30;
+            case 3: constant_K=15;
+                break;
+            case 4: constant_K=20;
+                break;
+            case 5: constant_K=30; //30
+        }
+
+        if(AStarPathCalculator.DEBUG) {
+            System.out.println(" Safety level = "+levelOfSafety);
+            System.out.println(" Constant K   = "+constant_K);
         }
 
         Block destinationBlock=gridMap.getBlockByPosition_blockMap(destinationPosition);

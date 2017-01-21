@@ -47,22 +47,11 @@ public class GridMap {
             System.out.println("     - Map Y = "+pGame.mapHeight()*TilePosition.SIZE_IN_PIXELS+" ,Grid cols = "+columns);
         }
 
-        List<Polygon> unwalkablePolygons=BWTA.getUnwalkablePolygons();
-
         for(int i=0;i<rows;i++) {
             for(int j=0;j<columns;j++) {
-                //i a j su prehodene preto, lebo Block(x,y) - pre x zodpoveda hodnota column
-//                blockMap[i][j]=new Block(new Position((rectangleSidePX/2)+rectangleSidePX*j,(rectangleSidePX/2)+rectangleSidePX*i),rectangleSidePX,i,j,pGame);
 
                 Block b=new Block(new Position((rectangleSidePX/2)+rectangleSidePX*j,(rectangleSidePX/2)+rectangleSidePX*i),rectangleSidePX,i,j,pGame);
-                for(Polygon pol:unwalkablePolygons) {
-                    if(pol.isInside(b.getPosition())) {
-                        b.setAccessibleByGround(false);
-                    } else {
-                        b.setAccessibleByGround(true);
-                    }
-                }
-
+                b.setAccessibleByGround(pGame.isWalkable(b.getPosition().getX()/8,b.getPosition().getY()/8));
                 blockMap[i][j]=b;
             }
         }

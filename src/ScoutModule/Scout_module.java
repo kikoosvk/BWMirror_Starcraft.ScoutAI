@@ -14,9 +14,9 @@ import java.util.Random;
  */
 public class Scout_module {
 
-    public static boolean DEBUG=true;
+    public static boolean DEBUG=false;
 
-    public static final int SAFETY_LEVEL=2;
+    public static final int SAFETY_LEVEL=3;
 
     public static final int MAP_REFRESH_FRAME_COUNT=15;
 
@@ -72,7 +72,7 @@ public class Scout_module {
 
     public void TEST_scoutBase() {
         System.out.println("Scouting unit = "+unitManager.getGroundScoutingUnits().get(0).getUnit().getType().toString());
-        actionManager.scoutBase(unitManager.getGroundScoutingUnits().get(0),SAFETY_LEVEL);
+        actionManager.scoutBase(unitManager.getGroundScoutingUnits().get(0));
     }
 
 

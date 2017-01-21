@@ -37,38 +37,38 @@ public class ActionManager {
 
     /* ------------------- Top level methods ------------------- */
 
-    public void scoutBase(ScoutingUnit pScoutingUnit, int pLevelOfSafety) {
-        scoutPosition(mapManager.getEnemyBasePosition().getPoint(), pScoutingUnit, pLevelOfSafety);
+    public void scoutBase(ScoutingUnit pScoutingUnit) {
+        scoutPosition(mapManager.getEnemyBasePosition().getPoint(), pScoutingUnit);
     }
 
     public void scoutBase_selectedUnits(List<ScoutingUnit> pScoutingUnits) {
         for(ScoutingUnit scu:pScoutingUnits) {
             if(scu.getUnit().isSelected()) {
-                scoutBase(scu, Scout_module.SAFETY_LEVEL);
+                scoutBase(scu);
             }
         }
     }
 
-    public void scoutMousePosition(ScoutingUnit pScoutingUnit, int pLevelOfSafety) {
-        scoutPosition(game.getMousePosition(), pScoutingUnit, pLevelOfSafety);
+    public void scoutMousePosition(ScoutingUnit pScoutingUnit) {
+        scoutPosition(game.getMousePosition(), pScoutingUnit);
     }
 
-    public void returnHome(ScoutingUnit pScoutingUnit, int pLevelOfSafety) {
+    public void returnHome(ScoutingUnit pScoutingUnit) {
         Position base=mapManager.getMyBasePosition();
 
-        pScoutingUnit.scout(mapManager.buildPath(pScoutingUnit.getUnit(),base, pLevelOfSafety,pScoutingUnit.getUnit().getType().isFlyer(),game, Color.Blue),false);
+        pScoutingUnit.scout(mapManager.buildPath(pScoutingUnit.getUnit(),base, pScoutingUnit.getSafety_level(), pScoutingUnit.getUnit().getType().isFlyer(),game, Color.Blue),false);
     }
 
     public void returnHome_selectedUnits(List<ScoutingUnit> pScoutingUnits) {
         for(ScoutingUnit scu: pScoutingUnits) {
             if(scu.getUnit().isSelected()) {
-                returnHome(scu,Scout_module.SAFETY_LEVEL);
+                returnHome(scu);
             }
         }
     }
 
-    public void scoutPosition(Position pPosition, ScoutingUnit pScoutingUnit, int pLevelOfSafety) {
-        AStarPathCalculator calc=mapManager.buildPath(pScoutingUnit.getUnit(),pPosition,pLevelOfSafety,pScoutingUnit.getUnit().isFlying(),game,Color.Teal);
+    public void scoutPosition(Position pPosition, ScoutingUnit pScoutingUnit) {
+        AStarPathCalculator calc=mapManager.buildPath(pScoutingUnit.getUnit(),pPosition,pScoutingUnit.getSafety_level(),pScoutingUnit.getUnit().isFlying(),game,Color.Teal);
         pScoutingUnit.scout(calc,false);
     }
 

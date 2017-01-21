@@ -43,6 +43,8 @@ public class ScoutingUnit {
 
     private Block microDestinationBlock;
 
+    private int safety_level=Scout_module.SAFETY_LEVEL;
+
 
     /* ------------------- Constructors ------------------- */
 
@@ -66,7 +68,7 @@ public class ScoutingUnit {
         aStarPathCalculator=pAStarPathCalculator;
     }
 
-    public void micro(AStarPathCalculator pMicroPathCalculator) {microPathCalculator=pMicroPathCalculator; }
+    //public void micro(AStarPathCalculator pMicroPathCalculator) {microPathCalculator=pMicroPathCalculator; }
 
 
     /* ------------------- initialising methods ------------------- */
@@ -194,14 +196,14 @@ public class ScoutingUnit {
             if(aStarPathCalculator==null&&path.size()>0) {
                 if(pGame.isVisible(path.get(0).getPosition().toTilePosition())) {
                     scoutingArea.remove(scoutingArea.getNearestField(this,pGame));
-                    aStarPathCalculator=pMapManager.buildPath(unit,scoutingArea.getNearestField(this,pGame).getPosition(), Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame, Color.Yellow);
+                    aStarPathCalculator=pMapManager.buildPath(unit,scoutingArea.getNearestField(this,pGame).getPosition(), safety_level, unit.getType().isFlyer(),pGame, Color.Yellow);
                 }
             } else if(aStarPathCalculator==null) {
                 PotentialField field=scoutingArea.getNearestField(this,pGame);
                 if(pGame.isVisible(field.getPosition().toTilePosition())) {
                     scoutingArea.remove(field);
                 } else {
-                    aStarPathCalculator=pMapManager.buildPath(unit,field.getPosition(),Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame,Color.Yellow);
+                    aStarPathCalculator=pMapManager.buildPath(unit,field.getPosition(),safety_level, unit.getType().isFlyer(),pGame,Color.Yellow);
                 }
             }
         }
@@ -217,7 +219,7 @@ public class ScoutingUnit {
         if(scoutingArea.size()>0) {
             System.out.println("Scouting area fields = "+scoutingArea.size());
             PotentialField pf=scoutingArea.getNearestField(this,pGame);
-            aStarPathCalculator=pMapManager.buildPath(unit,pf.getPosition(), Scout_module.SAFETY_LEVEL, false, pGame, Color.Blue);
+            aStarPathCalculator=pMapManager.buildPath(unit,pf.getPosition(), safety_level, false, pGame, Color.Blue);
             scoutingArea.remove(pf);
             System.out.println("Scouting area fields = " + scoutingArea.size());
         }
@@ -288,7 +290,7 @@ public class ScoutingUnit {
 
                 if(safeSTART!=null&&safeEND!=null) {
                     microDestinationBlock=safeEND;
-                    microPathCalculator=pMapManager.buildPath(unit,safeSTART.getPosition(),microDestinationBlock.getPosition(),Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame,Color.Red);
+                    microPathCalculator=pMapManager.buildPath(unit,safeSTART.getPosition(),microDestinationBlock.getPosition(),safety_level, unit.getType().isFlyer(),pGame,Color.Red);
                     removeFromPath(removeEND,removeStart);
                 }
 
@@ -297,7 +299,7 @@ public class ScoutingUnit {
                     if((unit.getType().isFlyer()&&pMapManager.getaStarModule().getGridMap().getBlockMap()[path.get(i).getRow()][path.get(i).getColumn()].isAirDamage())||!unit.getType().isFlyer()&&pMapManager.getaStarModule().getGridMap().getBlockMap()[path.get(i).getRow()][path.get(i).getColumn()].isGroundDamage()) {
                         if (path.get(i).isInPotentialField() || pMapManager.getaStarModule().getGridMap().getBlockMap()[path.get(i).getRow()][path.get(i).getColumn()].isInPotentialField()) {
                             microDestinationBlock=path.get(0);
-                            microPathCalculator=pMapManager.buildPath(unit,unit.getPosition(),microDestinationBlock.getPosition(),Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame,Color.Red);
+                            microPathCalculator=pMapManager.buildPath(unit,unit.getPosition(),microDestinationBlock.getPosition(),safety_level, unit.getType().isFlyer(),pGame,Color.Red);
                             Block b=path.get(0);
                             path.clear();
                             path.add(b);
@@ -315,9 +317,9 @@ public class ScoutingUnit {
             if(interruptMicro&&!unit.isUnderAttack()) {
                 microDestinationBlock=null;
                 microPath=new ArrayList<>();
-                aStarPathCalculator=pMapManager.buildPath(unit,path.get(0).getPosition(),Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame,Color.Purple);
+                aStarPathCalculator=pMapManager.buildPath(unit,path.get(0).getPosition(),safety_level,unit.getType().isFlyer(),pGame,Color.Purple);
             } else if(microDestinationBlock!=null&&unit.getPosition().getDistance(microDestinationBlock.getPosition())>250) {
-                microPathCalculator=pMapManager.buildPath(unit,microDestinationBlock.getPosition(),Scout_module.SAFETY_LEVEL,unit.getType().isFlyer(),pGame,Color.Red);
+                microPathCalculator=pMapManager.buildPath(unit,microDestinationBlock.getPosition(),safety_level,unit.getType().isFlyer(),pGame,Color.Red);
             } else if(microDestinationBlock!=null&&microDestinationBlock.isInPotentialField()||pMapManager.getaStarModule().getGridMap().getBlockMap()[microDestinationBlock.getRow()][microDestinationBlock.getColumn()].isInPotentialField()) {
                 microDestinationBlock=null;
                 micro(pMapManager,pGame);
@@ -386,6 +388,14 @@ public class ScoutingUnit {
 
 
     /* ------------------- Getters and Setters ------------------- */
+
+    public int getSafety_level() {
+        return safety_level;
+    }
+
+    public void setSafety_level(int safety_level) {
+        this.safety_level = safety_level;
+    }
 
     public boolean isHasTask() {
         return hasTask;

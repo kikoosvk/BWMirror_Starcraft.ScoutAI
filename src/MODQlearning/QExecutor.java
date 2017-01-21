@@ -3,6 +3,7 @@ package MODQlearning;
 import ScoutModule.Scout_module;
 import UnitManagement.ScoutingUnit;
 import bwapi.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class QExecutor {
 
     public static boolean DEBUG=true;
     public static boolean EXECUTE=false;
+    public static int EXEC_DELAY=50;
 
     private Scout_module scout_module;
     private Game game;
@@ -71,29 +73,29 @@ public class QExecutor {
 
     public void executeAll() {
         if(QExecutor.EXECUTE) {
-            if(game.getFrameCount()==execFrameCount+30) {
+            if(game.getFrameCount()==execFrameCount+EXEC_DELAY) {
                 execute_1();
-            } else if(game.getFrameCount()==execFrameCount+60) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*2) {
                 execute_2();
-            } else if(game.getFrameCount()==execFrameCount+90) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*3) {
                 execute_3();
-            } else if(game.getFrameCount()==execFrameCount+120) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*4) {
                 execute_4();
-            } else if(game.getFrameCount()==execFrameCount+150) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*5) {
                 execute_5();
-            } else if(game.getFrameCount()==execFrameCount+180) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*6) {
                 execute_6();
-            } else if(game.getFrameCount()==execFrameCount+210) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*7) {
                 execute_7();
-            } else if(game.getFrameCount()==execFrameCount+240) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*8) {
                 execute_8();
-            } else if(game.getFrameCount()==execFrameCount+270) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*9) {
                 execute_9();
-            } else if(game.getFrameCount()==execFrameCount+300) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*10) {
                 execute_10();
-            } else if(game.getFrameCount()==execFrameCount+330) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*11) {
                 execute_11();
-            } else if(game.getFrameCount()==execFrameCount+360) {
+            } else if(game.getFrameCount()==execFrameCount+EXEC_DELAY*12) {
                 execute_12();
             }
 
@@ -290,51 +292,51 @@ public class QExecutor {
     }
 
     public void execute_1() {
-        scout_module.getActionManager().scoutPosition(safePosition_1,scUnit_1,2);
+        scout_module.getActionManager().scoutPosition(safePosition_1,scUnit_1);
     }
 
     public void execute_2() {
-        scout_module.getActionManager().scoutPosition(safePosition_2,scUnit_2,2);
+        scout_module.getActionManager().scoutPosition(safePosition_2,scUnit_2);
     }
 
     public void execute_3() {
-        scout_module.getActionManager().scoutPosition(safePosition_3,scUnit_3,2);
+        scout_module.getActionManager().scoutPosition(safePosition_3,scUnit_3);
     }
 
     public void execute_4() {
-        scout_module.getActionManager().scoutPosition(safePosition_4,scUnit_4,2);
+        scout_module.getActionManager().scoutPosition(safePosition_4,scUnit_4);
     }
 
     public void execute_5() {
-        scout_module.getActionManager().scoutPosition(safePosition_5,scUnit_5,2);
+        scout_module.getActionManager().scoutPosition(safePosition_5,scUnit_5);
     }
 
     public void execute_6() {
-        scout_module.getActionManager().scoutPosition(safePosition_6,scUnit_6,2);
+        scout_module.getActionManager().scoutPosition(safePosition_6,scUnit_6);
     }
 
     public void execute_7() {
-        scout_module.getActionManager().scoutPosition(safePosition_7,scUnit_7,2);
+        scout_module.getActionManager().scoutPosition(safePosition_7,scUnit_7);
     }
 
     public void execute_8() {
-        scout_module.getActionManager().scoutPosition(safePosition_8,scUnit_8,2);
+        scout_module.getActionManager().scoutPosition(safePosition_8,scUnit_8);
     }
 
     public void execute_9() {
-        scout_module.getActionManager().scoutPosition(safePosition_9,scUnit_9,2);
+        scout_module.getActionManager().scoutPosition(safePosition_9,scUnit_9);
     }
 
     public void execute_10() {
-        scout_module.getActionManager().scoutPosition(safePosition_10,scUnit_10,2);
+        scout_module.getActionManager().scoutPosition(safePosition_10,scUnit_10);
     }
 
     public void execute_11() {
-        scout_module.getActionManager().scoutPosition(safePosition_11,scUnit_11,2);
+        scout_module.getActionManager().scoutPosition(safePosition_11,scUnit_11);
     }
 
     public void execute_12() {
-        scout_module.getActionManager().scoutPosition(safePosition_12,scUnit_12,2);
+        scout_module.getActionManager().scoutPosition(safePosition_12,scUnit_12);
     }
 
     public void drawAll() {

@@ -68,6 +68,7 @@ public class UnitManager {
 
 
     /* ------------------- Top-level methods ------------------- */
+
 //    ToDo: po implementacii Task
 //    public ScoutingUnit getClosestScoutingUnit(Task pTask, MapManager pMapManager, boolean pInterrupt) {
 //        Position destination=null;
