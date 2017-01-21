@@ -1,7 +1,9 @@
 package MapManager;
 
+import bwapi.Color;
 import bwapi.Game;
 import bwapi.Position;
+import bwapi.TilePosition;
 
 /**
  * Created by Chudjak Kristián on 05.01.2017.

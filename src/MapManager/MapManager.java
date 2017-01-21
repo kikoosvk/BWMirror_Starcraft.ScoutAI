@@ -10,6 +10,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -362,6 +363,53 @@ public class MapManager {
         if(expansionPositions.contains(pf)) {
             expansionPositions.remove(pf);
         }
+    }
+
+    public int calculateDangerForPath(Unit scout, ArrayList<Block> path){
+        int danger = 0;
+        double scoutSpeed = unitSpeed(scout);
+
+        for (Block block :
+                path) {
+            danger += block.getDamage();
+            for (Unit unit :
+                    game.enemy().getUnits()) {
+                if (unit.getType().canAttack() && isRanged(unit)){
+                    if(canUnitComeToABlock(block,unit, (int) (block.getDestination_distance()/scoutSpeed))){
+                        danger += unit.getPlayer().damage(unit.getType().groundWeapon());
+                        // TODO increase complexity of the danger calculation
+                    }
+                }
+            }
+        }
+
+        return danger;
+    }
+
+    public boolean isRanged(Unit unit){
+        return unit.getType().groundWeapon().maxRange() > 0;
+    }
+
+    /**
+     * retruns true if units can come to a block in stated frames
+     * @param block
+     * @param unit
+     * @param frames number of a block in a path
+     * @return
+     */
+    public boolean canUnitComeToABlock(Block block, Unit unit, int frames){
+        double unitSpeed = unitSpeed(unit);
+        double distance = distance(block.getPosition(),unit.getPosition());
+        double framesNeeded = distance / unitSpeed; // how many drames unit needs to travel the distance
+        return framesNeeded <= frames; // if units needs more than 
+    }
+
+    public double unitSpeed(Unit unit){
+        return unit.getPlayer().topSpeed(unit.getType());
+    }
+
+    public double distance(Position p1,Position p2){
+        return Point2D.distance(p1.getX(),p1.getY(),p2.getX(),p2.getY());
     }
 
 //    /**
