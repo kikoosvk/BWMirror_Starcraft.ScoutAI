@@ -57,7 +57,7 @@ public class MapManager {
 
     private Game game;
 
-    private GridMap2 gridMap;
+    private GridBasedMap gridMap;
 
     private MapLayersManager layersManager;
     //private GraphicsExtended graphicsEx;
@@ -75,7 +75,7 @@ public class MapManager {
         retreatFields=new ArrayList<>();
         scoutingAreas=new ArrayList<>();
         game=pGame;
-        gridMap = new GridMap2(MapLayersManager.DMGGRIDSIZE,game);
+        gridMap = new GridBasedMap(MapLayersManager.DMGGRIDSIZE,game);
 //        aStarModule=new AStarModule(new GridMap(MapLayersManager.DMGGRIDSIZE,game));
         aStarModule=new AStarModule(gridMap);
         myBasePosition=pGame.self().getStartLocation().toPosition();//BWTA.getStartLocation(game.self()).getPosition();
@@ -543,7 +543,7 @@ public class MapManager {
     }
 
     public int calculateFrames(Unit unit,Position posA,Position posB){
-        GridMap2 gridMap = new GridMap2(MapLayersManager.DMGGRIDSIZE,game);
+        GridBasedMap gridMap = new GridBasedMap(MapLayersManager.DMGGRIDSIZE,game);
         AStarPathCalculator aStarPathCalc = new AStarPathCalculator(posA,posB,unit.getHitPoints(),1,unit.getType().isFlyer(),gridMap,game,Color.White);
         aStarPathCalc.run();
         ArrayList<Block> path = aStarPathCalc.getBlockPathArray();
@@ -653,6 +653,9 @@ public class MapManager {
     }
 
 
+    public void addLayersMethod() {
+        layersManager.testMethod();
+    }
 
     public void drawDangerGrid() {
         aStarModule.getGridMap().drawDangerGrid(Color.Red,game);
@@ -721,4 +724,6 @@ public class MapManager {
     public void setRetreatFields(ArrayList<PotentialField> retreatFields) {
         this.retreatFields = retreatFields;
     }
+
+
 }
