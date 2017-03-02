@@ -1,4 +1,4 @@
-package MODaStar;
+package MapManager;
 
 import bwapi.*;
 
@@ -40,13 +40,18 @@ public class Block {
 
     private Block parent;
 
-    private double damage;
+    private double value;
 
     private int health;
 
     private boolean airDamage;
 
     private boolean groundDamage;
+
+    private double airDamageValue;
+
+    private double groundDamageValue;
+
 
     /* ------------------- Tree data structure attributes ------------------- */
 
@@ -55,6 +60,10 @@ public class Block {
     private Block rightChild;
 
     private Block sibiling;
+
+    /* ------------------- Pot field ------------------- */
+
+    private boolean set = false;
 
 
     /* ------------------- Constructors ------------------- */
@@ -70,7 +79,28 @@ public class Block {
         column=pColumn;
         accessibleByAir=true;
         startingBlock=false;
-        damage=0;
+        value =0;
+        airDamage=false;
+        groundDamage=false;
+        health=0;
+        showInGame=false;
+        leftChild=null;
+        rightChild=null;
+        inPotentialField=false;
+        color=Color.White;
+    }
+    public Block(Position position, double pRadius, int pRow, int pColumn) {
+        this.position=position;
+        distance_value=Double.MAX_VALUE;
+        destination_distance=-1;
+        f_value=-1;
+        parent=null;
+        radius=pRadius;
+        row=pRow;
+        column=pColumn;
+        accessibleByAir=true;
+        startingBlock=false;
+        value =0;
         airDamage=false;
         groundDamage=false;
         health=0;
@@ -93,7 +123,7 @@ public class Block {
         this.accessibleByAir = pBlock.isAccessibleByAir();
         this.accessibleByGround = pBlock.isAccessibleByGround();
         this.startingBlock = pBlock.isStartingBlock();
-        this.damage = pBlock.getDamage();
+        this.value = pBlock.getValue();
         this.airDamage = pBlock.isAirDamage();
         this.groundDamage = pBlock.isGroundDamage();
         this.health = pBlock.getHealth();
@@ -109,13 +139,14 @@ public class Block {
 
         pGame.drawDotMap(position,pColor);
         pGame.drawBoxMap((int)(position.getX() - (radius / 2)),(int)(position.getY() - (radius / 2)),(int)(position.getX() + (radius / 2)),(int)(position.getY() + (radius / 2)),pColor);
-        pGame.drawTextMap(position.getX()-2,position.getY()-8,String.format("%.0f", damage));
+        pGame.drawTextMap(position.getX()-2,position.getY()-8,String.format("%.0f", value));
+
 
 //        graphicsEx.setColor(color);
 //        graphicsEx.drawDotALTERNATIVE(new Vector2D(position.getPX(), position.getPY()));
 //        graphicsEx.drawBoxALTERNATIVE(new Vector2D((float) (position.getPX() - (radius / 2)), (float) (position.getPY() - (radius / 2))), new Vector2D((float) (position.getPX() + (radius / 2)), (float) (position.getPY() + (radius / 2))));
 //
-//        graphicsEx.drawTextALTERNATIVE(new Vector2D(position.getPX() - 2, position.getPY() - 8 ), String.format("%.0f", damage));
+//        graphicsEx.drawTextALTERNATIVE(new Vector2D(position.getPX() - 2, position.getPY() - 8 ), String.format("%.0f", value));
 //        //graphicsEx.drawTextALTERNATIVE(new Vector2D(position.getPX() - 2, position.getPY() - 8 ), isGroundDamage());
     }
 
@@ -142,6 +173,14 @@ public class Block {
         return true;
     }
 
+    public boolean isInPosition(Position position){
+        Vector2D topLeft = getLeftUpperCornerBoxVector();
+        Vector2D bottomRight = getRightLowerCornerBoxVector();
+        return topLeft.getX() <= position.getX() && bottomRight.getX() > position.getX() &&
+                topLeft.getY() <= position.getY() && bottomRight.getY() > position.getY() ;
+
+    }
+
 
     /* ------------------- Getters and Setters ------------------- */
 
@@ -151,6 +190,23 @@ public class Block {
 
     public void setAirDamage(boolean airDamage) {
         this.airDamage = airDamage;
+    }
+
+    public void setAirDamageValue(double airDamageValue) {
+        this.airDamageValue = airDamageValue;
+    }
+
+    public void setGroundDamageValue(double groundDamageValue) {
+        this.groundDamageValue = groundDamageValue;
+    }
+
+
+    public double getAirDamageValue() {
+        return airDamageValue;
+    }
+
+    public double getGroundDamageValue() {
+        return groundDamageValue;
     }
 
     public boolean isGroundDamage() {
@@ -240,7 +296,7 @@ public class Block {
                 ", destination_distance=" + destination_distance +
                 ", f_value=" + f_value +
                 ", parent=" + parent +
-                ", damage=" + damage +
+                ", value=" + value +
                 ", health=" + health +
                 ", airDamage=" + airDamage +
                 ", groundDamage=" + groundDamage +
@@ -250,6 +306,26 @@ public class Block {
                 '}';
     }
 
+
+    /**
+     * Returns upper left corner vector with coordinates
+     *
+     * @return Vector2D
+     */
+    public Vector2D getLeftUpperCornerBoxVector() {
+        return new Vector2D((float)(position.getX()-(radius/2)),(float)(position.getY()-(radius/2)));
+    }
+
+    /**
+     * Returns lower right corner vector with coordinates
+     *
+     * @return Vector2D
+     */
+    public Vector2D getRightLowerCornerBoxVector() {
+        return new Vector2D((float)(position.getX()+(radius/2)),(float)(position.getY()+(radius/2)));
+    }
+
+
     public boolean isShowInGame() {
         return showInGame;
     }
@@ -258,12 +334,12 @@ public class Block {
         this.showInGame = showInGame;
     }
 
-    public double getDamage() {
-        return damage;
+    public double getValue() {
+        return value;
     }
 
-    public void setDamage(double damage) {
-        this.damage = damage;
+    public void setValue(double value) {
+        this.value = value;
     }
 
     public int getHealth() {
@@ -356,5 +432,13 @@ public class Block {
 
     public void setParent(Block parent) {
         this.parent = parent;
+    }
+
+    public boolean isSet() {
+        return set;
+    }
+
+    public void setSet(boolean set) {
+        this.set = set;
     }
 }

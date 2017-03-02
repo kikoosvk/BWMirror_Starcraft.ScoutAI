@@ -117,8 +117,7 @@ public class HeatMap {
     public void heatManagement(Game pGame) {
         for(int i=0;i<rows;i++) {
             for(int j=0;j<columns;j++) {
-                if(pGame.isVisible(fieldMap[i][j].getPosition().getX(),fieldMap[i][j].getPosition().getY())) {
-
+                if(fieldMap[i][j].isVisible(pGame)) {
                     fieldMap[i][j].setHeat(0);
                 } else {
                     fieldMap[i][j].increaseHeat();
