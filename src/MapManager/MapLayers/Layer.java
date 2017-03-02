@@ -1,6 +1,6 @@
 package MapManager.MapLayers;
 
-import MapManager.GridMap2;
+import MapManager.GridBasedMap;
 import bwapi.Game;
 
 /**
@@ -8,7 +8,15 @@ import bwapi.Game;
  */
 public class Layer {
     protected Game game;
-    protected GridMap2 gridMap;
+    protected GridBasedMap gridMap;
+
+    public Layer(Game game,int rows,int columns) {
+        this.game = game;
+        this.gridMap = new GridBasedMap(rows,columns);
+    }
+
+    public Layer() {
+    }
 
     public void manage() {
 
@@ -18,11 +26,13 @@ public class Layer {
 
     }
 
-    public void add(Layer layer, GridMap2 merged){
-        this.gridMap.add(layer.gridMap,merged);
+    public Layer add(Layer layer){
+        Layer l = new Layer(game,gridMap.getRows(),gridMap.getColumns());
+        this.gridMap.add(layer.gridMap,l.gridMap);
+        return l;
     }
 
-    public void sub(Layer layer, GridMap2 gridMap){
+    public void sub(Layer layer, GridBasedMap gridMap){
 
     }
 

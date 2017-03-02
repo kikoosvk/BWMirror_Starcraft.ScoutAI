@@ -86,7 +86,6 @@ public class StaticWalkableLayer extends Layer {
             b.setSet(false);
         }
 
-        System.out.println("pocet spracovanych: " + pom);
 
 
     }
