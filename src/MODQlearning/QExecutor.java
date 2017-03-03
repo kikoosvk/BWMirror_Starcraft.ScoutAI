@@ -69,6 +69,7 @@ public class QExecutor {
 //            QExecutor.EXECUTE=true;
 //        }
         executeAll();
+        drawAll();
     }
 
     public void executeAll() {
@@ -342,6 +343,7 @@ public class QExecutor {
     public void drawAll() {
         drawSafePositions();
         drawSelectedIDs();
+        drawScoutingUnits();
     }
 
     public void drawSelectedIDs() {

@@ -42,10 +42,11 @@ public class Bot extends DefaultBWListener {
         */
         scout=new Scout_module(game);
         scout.onStart();
-        consoleHandler=new ConsoleHandler(scout);
+        consoleHandler=new ConsoleHandler(scout,scout.getMapManager());
 
         game.setLocalSpeed(30);
         game.enableFlag(1);
+
 
         System.out.println("ScoutAI bot working.");
     }

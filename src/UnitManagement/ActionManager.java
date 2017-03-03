@@ -69,6 +69,7 @@ public class ActionManager {
 
     public void scoutPosition(Position pPosition, ScoutingUnit pScoutingUnit) {
         AStarPathCalculator calc=mapManager.buildPath(pScoutingUnit.getUnit(),pPosition,pScoutingUnit.getSafety_level(),pScoutingUnit.getUnit().isFlying(),game,Color.Teal);
+
         pScoutingUnit.scout(calc,false);
     }
 

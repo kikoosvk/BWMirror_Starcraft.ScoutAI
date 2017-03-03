@@ -40,7 +40,9 @@ public class Scout_module {
 
     public void onStart() {
         initializeModules();
+        testInit();
     }
+
 
     public void onFrame() {
 
@@ -82,12 +84,41 @@ public class Scout_module {
     public void drawAll() {
         mapManager.drawAll();
         unitManager.drawAll();
-        qexecutor.drawAll();
+//        qexecutor.drawAll();
     }
 
     public void manageAll() {
         mapManager.manageAll(game);
         unitManager.manageAll(mapManager);
+//        testMethods();
+    }
+
+    private void testInit() {
+        for (Unit u:
+                game.self().getUnits()) {
+                if(!u.getType().isBuilding()) {
+                    ScoutingUnit sUnit = new ScoutingUnit(u);
+                    unitManager.getScoutingUnits().add(sUnit);
+                    unitManager.addScoutingUnit(sUnit);
+                    System.out.println("added: "+u.getPosition());
+                }else{
+                    System.out.println("not added: "+u.getPosition());
+                }
+
+        }
+    }
+
+
+    private static Position testPosition = new Position(1500,1600);
+
+    private void testMethods() {
+        for (ScoutingUnit sUnit :
+                unitManager.getScoutingUnits()) {
+            getActionManager().scoutPosition(testPosition,sUnit);
+            game.drawTextScreen(10,10,"leghth: "+sUnit.getPath().size()+" Danger: "+mapManager.calculateDangerForPath(sUnit.getUnit(),sUnit.getPath()));
+        }
+
+
     }
 
     //Test public
