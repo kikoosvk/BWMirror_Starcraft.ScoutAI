@@ -1,8 +1,12 @@
 package MapManager;
 
+import MapManager.utils.Utils;
 import bwapi.*;
 
+
 import java.util.*;
+
+
 
 /**
  * Grid map consists of array of blocks. Provides GEO information for other classes.
@@ -84,6 +88,26 @@ public class GridBasedMap {
         blockMap = new Block[rows][columns];
     }
 
+    public GridBasedMap(int size, Game game, boolean createBlocks) {
+        this.game = game;
+
+        int rectSize = Utils.closestPowerOfTwo(size);
+        rows = (game.mapHeight() * TilePosition.SIZE_IN_PIXELS) / rectSize;
+        columns = (game.mapWidth() * TilePosition.SIZE_IN_PIXELS) / rectSize;
+        blockMap = new Block[rows][columns];
+        if (createBlocks) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    Block b = new Block(new Position((rectSize / 2) + rectSize * j, (rectSize / 2) + rectSize * i), rectSize, i, j, game);
+                    b.setAccessibleByGround(game.isWalkable(b.getPosition().getX() / 8, b.getPosition().getY() / 8));
+                    blockMap[i][j] = b;
+                }
+            }
+        }
+
+    }
+
+
 
     /* ------------------- Initialization methods ------------------- */
 
@@ -124,17 +148,19 @@ public class GridBasedMap {
     // blocks that were changed
     public LinkedList<Block> zmenene = new LinkedList<>();
     public Queue<Block> blocks = new LinkedList<>();
+
     public void refreshGridMapNonRecursive(PotentialField pf) {
         zmenene.clear();
         blocks.clear();
         Block centerBlock = getBlockByPosition_blockMap(pf.getPosition());
         UnitType unit = pf.getUnitType();
-        blokSetValue(centerBlock, getBlokValue(unit),pf);
+        // center block is set to PotentialField center value
+        blokSetValue(centerBlock, pf.getCenterValue());
         ArrayList<Block> neighbour = getNeighbourBlocks(centerBlock);
         for (Block b :
                 neighbour) {
             blocks.add(b);
-            blokSetValue(b, getValueForBlock(b,0.8),pf);
+            blokSetValue(b, pf.getFunction().getBlockValue(pf, b));
         }
 
         while (!blocks.isEmpty()) {
@@ -145,7 +171,7 @@ public class GridBasedMap {
                     neighbour) {
                 if (pf.isPositionInRange(b.getPosition())) {
                     if (!b.isSet()) {
-                        blokSetValue(b, getValueForBlock(b,0.8),pf);
+                        blokSetValue(b, pf.getFunction().getBlockValue(pf, b));
                         blocks.add(b);
                     }
                 }
@@ -159,17 +185,44 @@ public class GridBasedMap {
         }
     }
 
-
-
-
-    public void refreshGridMap(PotentialField pPotentialField) {
+    public void addPfToGridMap(PotentialField pf) {
         zmenene.clear();
-        Block centerBlock = getBlockByPosition_blockMap(pPotentialField.getPosition());
-        UnitType unit = pPotentialField.getUnitType();
-        blokSetValue(centerBlock, getBlokValue(unit),pPotentialField);
-//        System.out.println("start");
-        setValueForBlockNeighbour(centerBlock, pPotentialField);
-//        System.out.println("end");
+        blocks.clear();
+        Block centerBlock = getBlockByPosition_blockMap(pf.getPosition());
+        blokSetValue(centerBlock, pf.getCenterValue());
+        ArrayList<Block> neighbour = getNeighbourBlocks(centerBlock);
+        for (Block b :
+                neighbour) {
+            blocks.add(b);
+            double value = pf.getFunction().getBlockValue(pf, b);
+            b.setValue(b.getValue() + value);
+
+            b.setSet(true);
+            zmenene.add(b);
+        }
+
+        while (!blocks.isEmpty()) {
+            Block block = blocks.poll();
+            neighbour = getNeighbourBlocks(block);
+
+            for (Block b :
+                    neighbour) {
+                if (pf.isPositionInRange(b.getPosition())) {
+                    if (!b.isSet()) {
+                        double value = pf.getFunction().getBlockValue(pf, b);
+                        b.setValue(b.getValue() + value);
+
+                        b.setSet(true);
+                        zmenene.add(b);
+
+                        blocks.add(b);
+                    }
+                }
+            }
+
+        }
+
+
         for (Block block :
                 zmenene) {
             block.setSet(false);
@@ -177,34 +230,7 @@ public class GridBasedMap {
     }
 
 
-    private double getBlokValue(UnitType unit) {
-        double value = unit.airWeapon().damageAmount() / (1 + unit.airWeapon().damageCooldown()) * 10;
-        value += unit.groundWeapon().damageAmount() / (1 + unit.airWeapon().damageCooldown()) * 10;
-        return value;
-    }
 
-    private void setValueForBlockNeighbour(Block block, PotentialField pf) {
-        ArrayList<Block> neighbour = getNeighbourBlocks(block);
-        for (Block b :
-                neighbour) {
-            if (pf.isPositionInRange(b.getPosition())) {
-                if (!b.isSet()) {
-                    blokSetValue(b, getValueForBlock(b,0.8),pf);
-                    setValueForBlockNeighbour(b, pf);
-                }
-            }
-        }
-    }
-
-    private void blokSetValue(Block blok, double value,PotentialField pf) {
-        if (blok.getValue() < value) {
-            blok.setValue(value);
-        }
-        setValuesForBlock(blok,pf);
-
-        blok.setSet(true);
-        zmenene.add(blok);
-    }
     public void blokSetValue(Block blok, double value) {
         if (blok.getValue() < value) {
             blok.setValue(value);
@@ -215,33 +241,8 @@ public class GridBasedMap {
     }
 
 
-    public void setValuesForBlock(Block blok,PotentialField pf) {
-        blok.setInPotentialField(true);
-        boolean airToAir = pf.getUnitType().airWeapon().targetsAir();
-        boolean airToGround = pf.getUnitType().airWeapon().targetsGround();
-        boolean groundToGround = pf.getUnitType().groundWeapon().targetsGround();
-        boolean groundToAir = pf.getUnitType().groundWeapon().targetsAir();
 
-        if (airToAir || groundToAir) {
-            blok.setAirDamage(true);
-        }
-        if (airToGround || groundToGround) {
-            blok.setGroundDamage(true);
-        }
-
-        //System.out.println("Air DMG = "+blockMap[row][col].isAirDamage());
-        //System.out.println("Ground DMG = "+blockMap[row][col].isGroundDamage());
-
-        if (pf.getUnitType().groundWeapon().maxRange() > 30 || pf.getUnitType().airWeapon().maxRange() > 30) {
-            blok.setValue(blok.getValue() + DAMAGE_MODIFIER * pf.getUnitType().groundWeapon().damageAmount());
-        } else {
-            blok.setValue(blok.getValue() + DAMAGE_MODIFIER * (pf.getRangeLengthInPercent(blok.getPosition()) * (pf.getUnitType().groundWeapon().damageAmount())));
-        }
-    }
-
-
-
-    public double getValueForBlockDec(Block block){
+    public double getValueForBlockDec(Block block) {
         ArrayList<Block> neighbour = getNeighbourBlocks(block);
         double value = block.getValue();
 
@@ -252,41 +253,11 @@ public class GridBasedMap {
             }
         }
         value--;
-        return value < 0 ? 0: value;
+        return value < 0 ? 0 : value;
     }
 
-    private double getValueForBlock(Block block,double multipe) {
 
-
-        ArrayList<Block> neighbour = getNeighbourBlocks(block);
-        double value = block.getValue();
-
-        for (Block b :
-                neighbour) {
-            if (value < b.getValue()) {
-                value = b.getValue();
-            }
-        }
-        return value * multipe;
-/*
-//        double value = block.getValue()* 4/16;
-        Block[] neighbour = getNeighbourBlocksArray(block);
-        double value = block.getValue()* 8/16;
-
-
-        value += neighbour[1].getValue() * 2/16;
-        value += neighbour[3].getValue() * 2/16;
-        value += neighbour[5].getValue() * 2/16;
-        value += neighbour[7].getValue() * 2/16;
-        value += neighbour[0].getValue() * 1/16;
-        value += neighbour[2].getValue() * 1/16;
-        value += neighbour[6].getValue() * 1/16;
-        value += neighbour[8].getValue() * 1/16;
-
-        return value;
-
-        */
-    }
+    /*
 
     public void updateGridMap(PotentialField pPotentialField) {
         Block centerBlock = getBlockByPosition_blockMap(pPotentialField.getPosition());
@@ -346,15 +317,15 @@ public class GridBasedMap {
             col = centerBlock.getColumn() - radiusBlockCount;
         }
 
-        /*if(pPotentialField.isCombined()){
+        if(pPotentialField.isCombined()){
             updateGridMap(pPotentialField.getNeedleTip());
         }
-*/
+
     }
+    */
 
-
-    public Block getBlock(Position position){
-        if(blockMap[0][0] == null) return null;
+    public Block getBlock(Position position) {
+        if (blockMap[0][0] == null) return null;
         double blockSize = blockMap[0][0].getRadius();
         int row = (int) (position.getY() / blockSize);
         int column = (int) (position.getX() / blockSize);
@@ -362,6 +333,7 @@ public class GridBasedMap {
     }
 
     ArrayList<Block> bloky = new ArrayList<Block>(10);
+
     public List<Block> getBlocksWithinBlock(Block block) {
         bloky.clear();
         Vector2D topLeft = block.getLeftUpperCornerBoxVector();
@@ -371,13 +343,13 @@ public class GridBasedMap {
         cycle:
         for (int i = startingBlock.getRow(); i < rows; i++) {
             for (int j = startingBlock.getColumn(); j < columns; j++) {
-                if(block.isInPosition(blockMap[i][j].getPosition())){
+                if (block.isInPosition(blockMap[i][j].getPosition())) {
                     bloky.add(blockMap[i][j]);
                 }
 
-                if(blockMap[i][j].getPosition().getY() > bottomRight.getY()){
+                if (blockMap[i][j].getPosition().getY() > bottomRight.getY()) {
                     break;
-                }else if(blockMap[i][j].getPosition().getX() > bottomRight.getX()){
+                } else if (blockMap[i][j].getPosition().getX() > bottomRight.getX()) {
                     break cycle;
                 }
             }
@@ -427,7 +399,6 @@ public class GridBasedMap {
     }
 
 
-
     public int getBlockMapSize() {
         int size = 0;
         for (int i = 0; i < rows; i++) {
@@ -437,11 +408,11 @@ public class GridBasedMap {
     }
 
 
-    public GridBasedMap add(GridBasedMap gridMap, GridBasedMap mergedMap){
+    public GridBasedMap add(GridBasedMap gridMap, GridBasedMap mergedMap) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 Block b = mergedMap.getBlockMap()[i][j];
-                if(b == null) {
+                if (b == null) {
                     b = new Block(blockMap[i][j].getPosition(), blockMap[i][j].getRadius(), i, j, game);
                 }
                 b.setValue(blockMap[i][j].getValue() + gridMap.blockMap[i][j].getValue() + b.getValue());
@@ -456,7 +427,6 @@ public class GridBasedMap {
         }
         return mergedMap;
     }
-
 
 
     /**

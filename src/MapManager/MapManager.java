@@ -2,7 +2,10 @@ package MapManager;
 
 import MODaStar.AStarModule;
 import MODaStar.AStarPathCalculator;
+import MapManager.MapLayers.Layer;
 import MapManager.MapLayers.MapLayersManager;
+import MapManager.MapLayers.UnitTracingLayer;
+import MapManager.utils.GridMapSaver;
 import bwapi.*;
 
 import java.awt.geom.Point2D;
@@ -18,7 +21,6 @@ public class MapManager {
      * Size of the edge of grid block
      */
 
-    //TODO astar cudne chodi
 
     private AStarModule aStarModule;
 
@@ -57,8 +59,6 @@ public class MapManager {
 
     private Game game;
 
-    private GridBasedMap gridMap;
-
     private MapLayersManager layersManager;
     //private GraphicsExtended graphicsEx;
 
@@ -71,17 +71,21 @@ public class MapManager {
     public MapManager(Game pGame) {
         heatMap=new HeatMap(pGame);
         expansionPositions=new ArrayList<>();
-        dangerFields=new ArrayList<>();
         retreatFields=new ArrayList<>();
         scoutingAreas=new ArrayList<>();
         game=pGame;
-        gridMap = new GridBasedMap(MapLayersManager.DMGGRIDSIZE,game);
+        layersManager = new MapLayersManager(game);
+        dangerFields=layersManager.getDangerLayer().getDangerFields();
+        GridBasedMap gridMap = layersManager.getDangerLayer().getGridMap();
 //        aStarModule=new AStarModule(new GridMap(MapLayersManager.DMGGRIDSIZE,game));
         aStarModule=new AStarModule(gridMap);
-        myBasePosition=pGame.self().getStartLocation().toPosition();//BWTA.getStartLocation(game.self()).getPosition();
+        myBasePosition=pGame.self().getStartLocation().toPosition();
+        //BWTA.getStartLocation(game.self()).getPosition();
 
         testPotField = new PotentialField(game,300,500,150);
-        layersManager = new MapLayersManager(game);
+
+
+        //Layer l = new Layer(game,);
     }
 
     public MapManager(Game pGame, AStarModule pAStarModule, HeatMap pHeatMap) {
@@ -261,34 +265,16 @@ public class MapManager {
         refreshDangerField(game);
         manageInitializationBaseArea(game);
         manageDangerFields(game);
-        manageGridMap();
         layersManager.manage();
     }
 
     PotentialField testPotField;
 
-    private void manageGridMap() {
-        long time = System.currentTimeMillis();
-        int units = 0;
-        gridMap.refreshStart();
-//        gridMap.refreshGridMap(testPotField);
-        for (PotentialField pf :
-                dangerFields) {
-            gridMap.refreshGridMapNonRecursive(pf);
-            units ++;
-        }
-        if((units >= 5 && units <= 15) || (units >= 90 && units <= 110) || (units >= 45 && units <= 55) || units > 150)
-        System.out.println("units: "+units+"   CAS: "+(System.currentTimeMillis() - time));
-    }
+
 
     public void refreshDangerField(Game pGame) {
-//        if(pGame.getFrameCount()%Scout_module.MAP_REFRESH_FRAME_COUNT==0) {
-//            refreshMap(pGame);
-//        }
-        long start = System.currentTimeMillis();
         refreshMap(pGame);
-//        System.out.println("TIME: "+(System.currentTimeMillis() - start));
-//        System.out.println("field: "+dangerFields.size());
+
 
     }
 
@@ -596,8 +582,6 @@ public class MapManager {
     public void drawAll() {
 
         layersManager.draw();
-
-//        gridMap.drawGridMap(Color.Red,game);
 //        for(Unit u: game.getAllUnits()) {
 //            if(u.isSelected()) {
 //                game.drawTextMap(u.getPosition(),""+u.getID());
@@ -615,7 +599,6 @@ public class MapManager {
 //        aStarModule.getGridMap().drawDangerGrid(Color.Red,game);
 //        aStarModule.drawAll(game.getAllUnits(),game);
 //        drawHeatMap(game);
-//        drawDangerFields();
 //        drawDangerGrid();
 
 
@@ -726,4 +709,22 @@ public class MapManager {
     }
 
 
+    public void saveMaps() {
+        int pom = 0;
+        for (Layer l :
+                layersManager.getLayers().values()) {
+            GridMapSaver.saveGridMap("layer"+pom,l.getGridMap());
+            pom++;
+        }
+    }
+
+    private int layersId = 0;
+    public void addTraceUnit(){
+        List<Unit> units = game.getSelectedUnits();
+        if(!units.isEmpty()){
+            layersManager.getLayers().put(layersId,new UnitTracingLayer(game,16,units.get(0)));
+            layersId++;
+            System.out.println("Unit added");
+        }
+    }
 }

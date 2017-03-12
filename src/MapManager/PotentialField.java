@@ -1,5 +1,7 @@
 package MapManager;
 
+import MapManager.PotentialFieldFunctions.Function;
+import MapManager.PotentialFieldFunctions.LinearFunction;
 import bwapi.*;
 
 import java.util.List;
@@ -19,6 +21,9 @@ public class PotentialField {
 
     private int row;
     private int column;
+
+    private double centerValue;
+    private Function function;
 
     /**
      * Center coordinate X
@@ -67,6 +72,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
     public PotentialField(Game pGame, Position position, int radius) {
@@ -79,6 +85,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         this.game=pGame;
+        this.function = new LinearFunction();
     }
 
     public PotentialField(Game pGame, Unit pUnit) {
@@ -92,6 +99,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
     public PotentialField(Game pGame, Unit pUnit,boolean needle) {
@@ -105,10 +113,29 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
         if(needle){
             needleTip = new PotentialField(game,pUnit,radius/2);
         }
     }
+
+    public PotentialField(Game pGame, Unit pUnit,double radius,boolean needle) {
+        this.priority=0;
+        this.X=pUnit.getPosition().getX();
+        this.Y=pUnit.getPosition().getY();
+        this.radius=radius;
+        this.heat=0;
+        this.id=pUnit.getID();
+        this.unitType=pUnit.getType();
+        this.row=-1;
+        this.column=-1;
+        game=pGame;
+        this.function = new LinearFunction();
+        if(needle){
+            needleTip = new PotentialField(game,pUnit,radius/2);
+        }
+    }
+
 
     public PotentialField(Game pGame, Unit unit,double radius) {
         this.priority=0;
@@ -120,6 +147,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
 
@@ -133,6 +161,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
     public PotentialField(Game pGame,Position position,int radius, int priority) {
@@ -145,6 +174,7 @@ public class PotentialField {
         this.row=-1;
         this.column=-1;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
     public PotentialField(Game pGame,Position position,int radius, int priority, int pRow, int pColumn) {
@@ -157,6 +187,7 @@ public class PotentialField {
         this.row=pRow;
         this.column=pColumn;
         game=pGame;
+        this.function = new LinearFunction();
     }
 
 
@@ -385,6 +416,22 @@ public class PotentialField {
         this.radius = radius;
     }
 
+    public double getCenterValue() {
+        return centerValue;
+    }
+
+    public Function getFunction() {
+        return function;
+    }
+
+    public void setFunction(Function function) {
+        this.function = function;
+    }
+
+    public void setCenterValue(double centerValue) {
+        this.centerValue = centerValue;
+    }
+
     public void showGraphicsRectangular(Game pGame, Color color) {
         pGame.drawBoxMap((int) (X+2),
                 (int) (Y + 2),
@@ -413,5 +460,13 @@ public class PotentialField {
     public void setPosition(Position pos){
         this.X = pos.getX();
         this.Y = pos.getY();
+    }
+
+    public double getMaxRadius(){
+        if(needleTip!=null){
+            return radius + needleTip.radius / 2;
+        }else{
+            return radius;
+        }
     }
 }
