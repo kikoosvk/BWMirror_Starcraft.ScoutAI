@@ -36,6 +36,10 @@ public class ConsoleHandler {
             break;
             case "layeradd": mapManager.addLayersMethod();
             break;
+            case "savemaps": mapManager.saveMaps();
+                break;
+            case "trace": mapManager.addTraceUnit();
+            break;
             case "calc":
                 Unit u = scoutBot.getUnitManager().getAllScoutingUnits().get(0).getUnit();
                 int frames = scoutBot.getMapManager().calculateFrames(u,u.getPosition(),new Position(u.getPosition().getX(),u.getPosition().getY()+100));
