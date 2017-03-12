@@ -16,6 +16,7 @@ public class WalkableLayer extends Layer {
     private HashMap<Integer,PotentialField> blockingUnits;
 
     public WalkableLayer(Game game) {
+        super(game,TILE_SIZE);
         this.game = game;
         this.blockingUnits = new HashMap<>(200);
         System.out.println("Map size: " + game.mapWidth() + "," + game.mapHeight());
@@ -59,7 +60,6 @@ public class WalkableLayer extends Layer {
                 refreshGridMapNonRecursive(pf);
             }
 
-            System.out.println("manage walckable time: "+(System.currentTimeMillis() - milis));
         }
         frameCounter ++;
     }
@@ -214,7 +214,7 @@ public class WalkableLayer extends Layer {
 
     @Override
     public void draw() {
-        for (PotentialField pf :
+       /* for (PotentialField pf :
                 blockingUnits.values()) {
             pf.showGraphicsCircular(Color.Blue);
         }
@@ -240,6 +240,6 @@ public class WalkableLayer extends Layer {
 
 
         }
-
+*/
     }
 }

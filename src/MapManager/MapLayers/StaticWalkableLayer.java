@@ -20,6 +20,7 @@ public class StaticWalkableLayer extends Layer {
     private static final int STARTING_VALUE = 5;
 
     public StaticWalkableLayer(Game game) {
+        super(game,TILE_SIZE);
         this.game = game;
         System.out.println("Map size: " + game.mapWidth() + "," + game.mapHeight());
         this.gridMap = new GridBasedMap(game.mapWidth(), game.mapHeight());

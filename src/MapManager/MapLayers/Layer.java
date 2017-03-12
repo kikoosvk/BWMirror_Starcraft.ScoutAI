@@ -10,13 +10,19 @@ public class Layer {
     protected Game game;
     protected GridBasedMap gridMap;
 
+
     public Layer(Game game,int rows,int columns) {
         this.game = game;
         this.gridMap = new GridBasedMap(rows,columns);
     }
 
-    public Layer() {
+    public Layer(Game game,int size) {
+        this.game = game;
+        this.gridMap = new GridBasedMap(size,game);
+
     }
+
+
 
     public void manage() {
 
@@ -35,6 +41,12 @@ public class Layer {
     public void sub(Layer layer, GridBasedMap gridMap){
 
     }
+
+
+    public GridBasedMap getGridMap() {
+        return gridMap;
+    }
+
 
 
 }

@@ -13,11 +13,12 @@ import java.util.HashMap;
 public class MapLayersManager {
     private Game game;
 
-    private GridBasedMap dangerMap;
+    private DangerLayer dangerLayer;
     private WalkableLayer walkableLayer;
     private StaticWalkableLayer walkableLayerStatic;
 
-    private HashMap<Integer, GridBasedMap> layers;
+    private HashMap<Integer, Layer> layers;
+
 
     public static final int DMGGRIDSIZE=18; //18
     public MapLayersManager(Game game) {
@@ -25,26 +26,40 @@ public class MapLayersManager {
         this.layers = new HashMap<>();
         walkableLayer = new WalkableLayer(game);
         walkableLayerStatic = new StaticWalkableLayer(game);
-        dangerMap = new GridBasedMap(DMGGRIDSIZE, game);
+        dangerLayer = new DangerLayer(game);
+
+
 
     }
 
 
-    public HashMap<Integer, GridBasedMap> getLayers() {
+    public HashMap<Integer, Layer> getLayers() {
         return layers;
     }
 
-    public GridBasedMap getDangerMap() {
-        return dangerMap;
+    public DangerLayer getDangerLayer() {
+        return dangerLayer;
     }
 
     public void manage(){
-        walkableLayer.manage();
+        //walkableLayer.manage();
+        dangerLayer.manage();
+        for (Layer layer :
+                layers.values()) {
+            layer.manage();
+
+        }
     }
 
     public void draw() {
         //walkableLayerStatic.draw();
         walkableLayer.draw();
+        dangerLayer.draw();
+        for (Layer layer :
+                layers.values()) {
+            layer.draw();
+
+        }
     }
 
     public void testMethod() {
@@ -72,5 +87,11 @@ public class MapLayersManager {
         System.out.println("TEST: milis: "+(System.currentTimeMillis() - milis));
     }
 
+    public StaticWalkableLayer getWalkableLayerStatic() {
+        return walkableLayerStatic;
+    }
 
+    public WalkableLayer getWalkableLayer() {
+        return walkableLayer;
+    }
 }
